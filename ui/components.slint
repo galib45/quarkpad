@@ -1,4 +1,4 @@
-import { LineEdit, Button } from "std-widgets.slint";
+import { LineEdit, Button, Palette } from "std-widgets.slint";
 
 export component AppBar inherits Rectangle {
     in-out property <string> title;
@@ -7,7 +7,7 @@ export component AppBar inherits Rectangle {
 
     height: 58px;
     background: #222;
-    
+
     HorizontalLayout {
         padding-top: 12px;
         padding-bottom: 12px;
@@ -23,10 +23,11 @@ export component AppBar inherits Rectangle {
 
         Button {
             icon: trailing-icon;
-            clicked => { icon-clicked() }
+            clicked => {
+                icon-clicked()
+            }
         }
     }
-    
 }
 
 export component FileInput {
@@ -37,12 +38,85 @@ export component FileInput {
 
     HorizontalLayout {
         spacing: 4px;
-        le := LineEdit { text: path; }
-        Button {
-            icon: folder 
-                ? @image-url("../resources/folder_open.svg") 
-                : @image-url("../resources/file_open.svg");
-            clicked => { choose-file() }
+        le := LineEdit {
+            text: path;
         }
+
+        Button {
+            icon: folder ? @image-url("../resources/folder_open.svg") : @image-url("../resources/file_open.svg");
+            clicked => {
+                choose-file()
+            }
+        }
+    }
+}
+
+export component CompositeButton inherits Rectangle {
+    // Public properties
+    in property <string> text: "Button";
+    in property <bool> enabled: true;
+    in property <bool> is-dark-mode: true;
+
+    // Callback
+    callback clicked();
+
+    // Styling
+    background: Palette.control-background;
+    border-radius: 4px;
+    min-width: 80px;
+    min-height: 32px;
+
+    // Text element
+    // text-element := Text {
+    //     text: root.text;
+    //     color: root.enabled ? (is-dark-mode ? #FFFFFF : #000000) : #808080;
+    //     horizontal-alignment: center;
+    //     vertical-alignment: center;
+    // }
+    @children
+
+    // Touch area for interaction
+    ta := TouchArea {
+        enabled: root.enabled;
+
+        forward-focus: focus-scope;
+
+        focus-scope := FocusScope {
+            x: 0;
+            width: 0;
+            enabled: root.enabled;
+
+            key-pressed(event) => {
+                // Trigger click on Space or Enter
+                if (event.text == " " || event.text == "\n") {
+                    root.clicked();
+                    return accept;
+                }
+                return reject;
+            }
+        }
+
+        clicked => {
+            if (root.enabled) {
+                root.clicked();
+            }
+        }
+
+        // Overlay for visual feedback
+        overlay := Rectangle {
+            // border-radius: parent.border-radius;
+        }
+
+        states [
+            disabled when !root.enabled: {
+                overlay.background: is-dark-mode ? #00000040 : #F0F0F040;
+            }
+            pressed when ta.pressed && root.enabled: {
+                overlay.background: is-dark-mode ? #16161680 : #BEBEBE80;
+            }
+            hover when ta.has-hover && root.enabled: {
+                overlay.background: #63636333;
+            }
+        ]
     }
 }

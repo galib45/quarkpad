@@ -7,7 +7,32 @@ export component App inherits Window {
     in-out property <int> current_page: 0;
     in-out property <Settings> settings;
     in-out property <Game> game;
-    in property <[Game]> games;
+    in property <[Game]> games: [
+        {
+            name: "Hollow Knight",
+            cover-path: "/home/galib/Downloads/hollow-knight.jpg",
+            exe-path: "/mnt/data/games/installed/Hollow Knight v1.5.78.11833/Hollow Knight.exe",
+            wineprefix: "/mnt/data/games/wineprefix"
+        },
+        {
+            name: "Need for Speed: Most Wanted (2012)",
+            cover-path: "/home/galib/Downloads/Nfs-most-wanted-2012-gen-packart.jpg",
+            exe-path: "/mnt/data/games/installed/Need for Speed - Most Wanted/NFS13.exe",
+            wineprefix: "/mnt/data/games/wineprefix"
+        },
+        {
+            name: "FIFA 16",
+            cover-path: "/home/galib/Downloads/fifa16.jpg",
+            exe-path: "/mnt/data/games/installed/FIFA 16/fifa16.exe",
+            wineprefix: "/mnt/data/games/wineprefix"
+        },
+        {
+            name: "Half-Life",
+            cover-path: "/home/galib/Downloads/half-life.jpg",
+            exe-path: "/mnt/data/games/installed/Half-Life/hl.exe",
+            wineprefix: "/mnt/data/games/wineprefix"
+        }
+    ];
     in property <int> editing: -1;
 
     // home callbacks

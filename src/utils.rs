@@ -10,6 +10,7 @@ pub fn launch_game(game: &Game, settings: &Settings) {
 
     Command::new(umu_run_path)
         .arg(exe_name)
+        .arg("-window")
         .current_dir(exe_dir)
         .env("WINEPREFIX", game.wineprefix.as_os_str())
         .env("PROTONPATH", settings.proton_path.as_os_str())

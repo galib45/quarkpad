@@ -1,12 +1,19 @@
-import { AppBar } from "components.slint";
-import { ScrollView, Button, ListView } from "std-widgets.slint";
+import { AppBar, CompositeButton } from "components.slint";
+import {
+    ScrollView,
+    Button,
+    ListView,
+    VerticalBox,
+    Palette,
+} from "std-widgets.slint";
 import { Game } from "add-game.slint";
 
 export struct GameForDisplay {
     name: string,
     cover: image,
     exe-path: string,
-    wineprefix: string}
+    wineprefix: string,
+}
 
 component GameCard inherits Rectangle {
     in property <image> cover;
@@ -21,6 +28,32 @@ component GameCard inherits Rectangle {
         image-fit: fill;
         width: parent.width;
         height: parent.height;
+    }
+}
+
+component PopupMenuButton {
+    in property <string> text;
+    in property <image> icon;
+    callback clicked <=> cb.clicked;
+    cb := CompositeButton {
+        HorizontalLayout {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            padding-left: 16px;
+            padding-right: 16px;
+            spacing: 16px;
+            alignment: start;
+
+            if icon.height != 0: Image {
+                source: icon;
+                height: 20px;
+            }
+
+            if !text.is-empty: Text {
+                text: text;
+                vertical-alignment: center;
+            }
+        }
     }
 }
 
@@ -40,57 +73,99 @@ export component HomePage inherits Rectangle {
         }
 
         ScrollView {
-            // viewport-width: min(1000px, max(700px, parent.width * 0.8));
             HorizontalLayout {
                 alignment: center;
                 padding: 32px;
-                // width: min(600px, max(300px, parent.width * 0.8));
                 VerticalLayout {
                     spacing: 32px;
                     for game[i] in games: HorizontalLayout {
+                        spacing: 16px;
                         GameCard {
                             cover: load-image(game.cover-path);
                             width: 120px;
                             height: 150px;
                         }
 
-                        VerticalLayout {
+                        HorizontalLayout {
                             width: 400px;
-                            padding: 16px;
-                            alignment: center;
-                            spacing: 48px;
+                            padding-top: 8px;
+                            spacing: 32px;
                             Text {
                                 text: game.name;
-                                font-size: 16px;
-                                font-weight: 600;
+                                font-size: 20px;
+                                wrap: word-wrap;
                             }
 
-                            HorizontalLayout {
-                                height: 32px;
-                                width: 50%;
-                                spacing: 12px;
+                            VerticalLayout {
                                 Button {
-                                    text: "Remove";
+                                    icon: @image-url("../resources/more_vert.svg");
+                                    icon-size: 24px;
+                                    height: 32px;
+                                    width: 48px;
                                     clicked => {
-                                        remove-game(i)
+                                        popup.show()
                                     }
                                 }
 
-                                Button {
-                                    text: "Edit";
-                                    clicked => {
-                                        edit-game(i)
-                                    }
-                                }
+                                popup := PopupWindow {
+                                    y: 36px;
+                                    Rectangle {
+                                        background: Palette.control-background;
+                                        VerticalLayout {
+                                            PopupMenuButton {
+                                                icon: @image-url("../resources/rocket_launch.svg");
+                                                text: "Launch";
+                                                clicked => {
+                                                    launch-game(i);
+                                                }
+                                            }
 
-                                Button {
-                                    text: "Launch";
-                                    clicked => {
-                                        launch-game(i)
+                                            PopupMenuButton {
+                                                icon: @image-url("../resources/edit.svg");
+                                                text: "Edit";
+                                                clicked => {
+                                                    edit-game(i);
+                                                }
+                                            }
+
+                                            PopupMenuButton {
+                                                icon: @image-url("../resources/delete.svg");
+                                                text: "Remove";
+                                                clicked => {
+                                                    remove-game(i);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+
+                        // HorizontalLayout {
+                            //     height: 32px;
+                            //     width: 50%;
+                            //     spacing: 12px;
+                            //     Button {
+                            //         text: "Remove";
+                            //         clicked => {
+                            //             remove-game(i)
+                            //         }
+                            //     }
+
+                            //     Button {
+                            //         text: "Edit";
+                            //         clicked => {
+                            //             edit-game(i)
+                            //         }
+                            //     }
+
+                            //     Button {
+                            //         text: "Launch";
+                            //         clicked => {
+                            //             launch-game(i)
+                            //         }
+                            //     }
+                            // }
                     }
                 }
             }
@@ -99,6 +174,7 @@ export component HomePage inherits Rectangle {
 
     add-fab := Button {
         icon: @image-url("../resources/add_2.svg");
+        text: "Add Game";
         x: parent.width - self.width - 16px;
         y: parent.height - self.height - 16px;
     }
