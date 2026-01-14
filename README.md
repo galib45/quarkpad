@@ -2,7 +2,7 @@
 
 ## Overview
 
-Quarkpad is a simple, open-source game launcher for Linux, designed to manage and launch games using [https://github.com/GloriousEggroll/proton-ge-custom](Proton-GE). It uses [https://github.com/Open-Wine-Components/umu-launcher](Umu) to run proton without steam and [https://github.com/ValveSoftware/gamescope](Gamescope) for scaling and going fullscreen. The UI is made with the `slint` framework. You can organize the game library, add new games, configure basic settings, and launch them.
+Quarkpad is a simple, open-source game launcher for Linux, designed to manage and launch games using [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom). It uses [Umu](https://github.com/Open-Wine-Components/umu-launcher) to run proton without steam and [Gamescope](https://github.com/ValveSoftware/gamescope) for scaling and going fullscreen. The UI is made with the `slint` framework. You can organize the game library, add new games, configure basic settings, and launch them.
 
 ## Screenshots
 <div style="display: flex; flex-wrap: wrap; justify-content: center;">
@@ -46,9 +46,9 @@ quarkpad
 ### Prerequisites
 
 - Rust and Cargo (latest stable version recommended)
-- [https://github.com/GloriousEggroll/proton-ge-custom](Proton-GE)
-- [https://github.com/Open-Wine-Components/umu-launcher](Umu)
-- [https://github.com/ValveSoftware/gamescope](Gamescope)
+- [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom)
+- [Umu](https://github.com/Open-Wine-Components/umu-launcher)
+- [Gamescope](https://github.com/ValveSoftware/gamescope)
 
 ### Building
 
