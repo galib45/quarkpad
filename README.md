@@ -31,7 +31,15 @@ Quarkpad is a simple, open-source game launcher for Linux, designed to manage an
 
 ## Getting Started
 
-You can install Hadron Launcher directly from crates.io:
+### Prerequisites
+
+- Rust and Cargo (latest stable version recommended)
+- [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom)
+- [Umu](https://github.com/Open-Wine-Components/umu-launcher)
+- [Gamescope](https://github.com/ValveSoftware/gamescope)
+
+### Installation
+You can install Quarkpad directly from crates.io:
 
 ```bash
 cargo install quarkpad
@@ -42,13 +50,6 @@ After installation, you can run the application from your terminal:
 ```bash
 quarkpad
 ```
-
-### Prerequisites
-
-- Rust and Cargo (latest stable version recommended)
-- [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom)
-- [Umu](https://github.com/Open-Wine-Components/umu-launcher)
-- [Gamescope](https://github.com/ValveSoftware/gamescope)
 
 ### Building
 
