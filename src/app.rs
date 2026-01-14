@@ -159,7 +159,7 @@ impl crate::App {
                 if let Some(game) = games.row_data(index as usize) {
                     utils::launch_game(
                         &models::Game::from(game),
-                        &models::Settings::from(settings)
+                        &models::Settings::from(settings),
                     );
                 }
             }

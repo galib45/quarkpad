@@ -8,13 +8,6 @@ import {
 } from "std-widgets.slint";
 import { Game } from "add-game.slint";
 
-export struct GameForDisplay {
-    name: string,
-    cover: image,
-    exe-path: string,
-    wineprefix: string,
-}
-
 component GameCard inherits Rectangle {
     in property <image> cover;
 

@@ -8,9 +8,14 @@ pub fn launch_game(game: &Game, settings: &Settings) {
     let wine_path = settings.proton_path.join("files").join("bin").join("wine");
     let umu_run_path = settings.umu_path.join("umu-run");
 
-    Command::new(umu_run_path)
+    Command::new("gamescope")
+        .arg("-W").arg("1920")
+        .arg("-H").arg("1080")
+        .arg("-f")
+        .arg("--force-grab-cursor")
+        .arg("--")
+        .arg(umu_run_path)
         .arg(exe_name)
-        .arg("-window")
         .current_dir(exe_dir)
         .env("WINEPREFIX", game.wineprefix.as_os_str())
         .env("PROTONPATH", settings.proton_path.as_os_str())
