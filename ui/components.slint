@@ -1,4 +1,4 @@
-import { LineEdit, Button, Palette } from "std-widgets.slint";
+import { LineEdit, Button, Palette, ScrollView } from "std-widgets.slint";
 
 export component AppBar inherits Rectangle {
     in-out property <string> title;
@@ -6,7 +6,7 @@ export component AppBar inherits Rectangle {
     callback icon-clicked();
 
     height: 58px;
-    background: #222;
+    background: Palette.control-background;
 
     HorizontalLayout {
         padding-top: 12px;
@@ -23,6 +23,7 @@ export component AppBar inherits Rectangle {
 
         Button {
             icon: trailing-icon;
+            colorize-icon: true;
             clicked => {
                 icon-clicked()
             }
@@ -44,6 +45,7 @@ export component FileInput {
 
         Button {
             icon: folder ? @image-url("../resources/folder_open.svg") : @image-url("../resources/file_open.svg");
+            colorize-icon: true;
             clicked => {
                 choose-file()
             }
@@ -53,9 +55,8 @@ export component FileInput {
 
 export component CompositeButton inherits Rectangle {
     // Public properties
-    in property <string> text: "Button";
     in property <bool> enabled: true;
-    in property <bool> is-dark-mode: true;
+    in property <color> tint: #636363;
 
     // Callback
     callback clicked();
@@ -66,19 +67,11 @@ export component CompositeButton inherits Rectangle {
     min-width: 80px;
     min-height: 32px;
 
-    // Text element
-    // text-element := Text {
-    //     text: root.text;
-    //     color: root.enabled ? (is-dark-mode ? #FFFFFF : #000000) : #808080;
-    //     horizontal-alignment: center;
-    //     vertical-alignment: center;
-    // }
     @children
 
     // Touch area for interaction
     ta := TouchArea {
         enabled: root.enabled;
-
         forward-focus: focus-scope;
 
         focus-scope := FocusScope {
@@ -103,20 +96,56 @@ export component CompositeButton inherits Rectangle {
         }
 
         // Overlay for visual feedback
-        overlay := Rectangle {
-            // border-radius: parent.border-radius;
-        }
+        overlay := Rectangle { }
 
         states [
             disabled when !root.enabled: {
-                overlay.background: is-dark-mode ? #00000040 : #F0F0F040;
+                overlay.background: root.tint.with-alpha(0.10);
             }
             pressed when ta.pressed && root.enabled: {
-                overlay.background: is-dark-mode ? #16161680 : #BEBEBE80;
+                overlay.background: root.tint.with-alpha(0.30);
             }
             hover when ta.has-hover && root.enabled: {
-                overlay.background: #63636333;
+                overlay.background: root.tint.with-alpha(0.20);
             }
         ]
+    }
+}
+
+export component LineEditWithLabel inherits Rectangle {
+    in property <string> label;
+    in-out property <string> text;
+    in-out property <bool> enabled <=> edit.enabled;
+    callback edited <=> edit.edited;
+    height: 64px;
+    VerticalLayout {
+        spacing: 6px;
+        Text {
+            text: label;
+        }
+
+        edit := LineEdit {
+            text: text;
+        }
+    }
+}
+
+export component FileInputWithLabel inherits Rectangle {
+    in property <string> label;
+    in-out property <string> text;
+    in-out property <bool> folder <=> file-input.folder;
+    callback choose-file <=> file-input.choose-file;
+    callback edited <=> file-input.edited;
+    height: 64px;
+    VerticalLayout {
+        spacing: 6px;
+        Text {
+            text: label;
+        }
+
+        file-input := FileInput {
+            height: 36px;
+            path: text;
+        }
     }
 }

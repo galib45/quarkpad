@@ -164,6 +164,20 @@ impl crate::App {
                 }
             }
         });
+
+        let app_weak = self.as_weak();
+        self.on_winecfg(move |index| {
+            if let Some(app) = app_weak.upgrade() {
+                let games = app.get_games();
+                let settings = app.get_settings();
+                if let Some(game) = games.row_data(index as usize) {
+                    utils::launch_winecfg(
+                        &models::Game::from(game),
+                        &models::Settings::from(settings),
+                    );
+                }
+            }
+        });
     }
 
     fn set_proton_path(&self, path: PathBuf) {

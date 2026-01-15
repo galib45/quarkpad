@@ -7,6 +7,7 @@ import {
     Palette,
 } from "std-widgets.slint";
 import { Game } from "add-game.slint";
+import { ThemeAgnosticColors } from "colors.slint";
 
 component GameCard inherits Rectangle {
     in property <image> cover;
@@ -27,8 +28,10 @@ component GameCard inherits Rectangle {
 component PopupMenuButton {
     in property <string> text;
     in property <image> icon;
+    in property <color> tint: Palette.foreground;
     callback clicked <=> cb.clicked;
     cb := CompositeButton {
+        tint: tint;
         HorizontalLayout {
             padding-top: 8px;
             padding-bottom: 8px;
@@ -39,12 +42,14 @@ component PopupMenuButton {
 
             if icon.height != 0: Image {
                 source: icon;
+                colorize: tint;
                 height: 20px;
             }
 
             if !text.is-empty: Text {
                 text: text;
                 vertical-alignment: center;
+                color: tint;
             }
         }
     }
@@ -58,6 +63,7 @@ export component HomePage inherits Rectangle {
     callback remove-game(int);
     callback edit-game(int);
     callback launch-game(int);
+    callback winecfg(int);
 
     VerticalLayout {
         app-bar := AppBar {
@@ -69,6 +75,7 @@ export component HomePage inherits Rectangle {
             HorizontalLayout {
                 alignment: center;
                 padding: 32px;
+
                 VerticalLayout {
                     spacing: 32px;
                     for game[i] in games: HorizontalLayout {
@@ -93,6 +100,7 @@ export component HomePage inherits Rectangle {
                                 Button {
                                     icon: @image-url("../resources/more_vert.svg");
                                     icon-size: 24px;
+                                    colorize-icon: true;
                                     height: 32px;
                                     width: 48px;
                                     clicked => {
@@ -124,8 +132,17 @@ export component HomePage inherits Rectangle {
                                             PopupMenuButton {
                                                 icon: @image-url("../resources/delete.svg");
                                                 text: "Remove";
+                                                tint: ThemeAgnosticColors.red;
                                                 clicked => {
                                                     remove-game(i);
+                                                }
+                                            }
+
+                                            PopupMenuButton {
+                                                icon: @image-url("../resources/wine_logo.svg");
+                                                text: "Run winecfg";
+                                                clicked => {
+                                                    winecfg(i);
                                                 }
                                             }
                                         }
@@ -133,32 +150,6 @@ export component HomePage inherits Rectangle {
                                 }
                             }
                         }
-
-                        // HorizontalLayout {
-                            //     height: 32px;
-                            //     width: 50%;
-                            //     spacing: 12px;
-                            //     Button {
-                            //         text: "Remove";
-                            //         clicked => {
-                            //             remove-game(i)
-                            //         }
-                            //     }
-
-                            //     Button {
-                            //         text: "Edit";
-                            //         clicked => {
-                            //             edit-game(i)
-                            //         }
-                            //     }
-
-                            //     Button {
-                            //         text: "Launch";
-                            //         clicked => {
-                            //             launch-game(i)
-                            //         }
-                            //     }
-                            // }
                     }
                 }
             }
@@ -168,6 +159,7 @@ export component HomePage inherits Rectangle {
     add-fab := Button {
         icon: @image-url("../resources/add_2.svg");
         text: "Add Game";
+        colorize-icon: true;
         x: parent.width - self.width - 16px;
         y: parent.height - self.height - 16px;
     }

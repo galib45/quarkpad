@@ -42,6 +42,7 @@ export component App inherits Window {
     callback remove-game(int);
     callback edit-game(int);
     callback launch-game(int);
+    callback winecfg(int);
 
     // settings callbacks
     callback choose-proton-path();
@@ -57,12 +58,15 @@ export component App inherits Window {
     callback cover-path-edited();
     callback exe-path-edited();
     callback wineprefix-edited();
+    callback toggle-gamescope();
+    callback gamescope-width-edited();
+    callback gamescope-height-edited();
 
     // preferred-width: 800px;
     // preferred-height: 600px;
     title: "Quarkpad";
 
-    if current_page == 0: HomePage {
+    if current_page == 0: home-page := HomePage {
         games: games;
         load-image(path) => {
             load-image(path)
@@ -75,6 +79,9 @@ export component App inherits Window {
         }
         launch-game(index) => {
             launch-game(index)
+        }
+        winecfg(index) => {
+            winecfg(index)
         }
         settings-clicked => {
             settings-clicked()
@@ -128,6 +135,15 @@ export component App inherits Window {
         }
         wineprefix-edited(text) => {
             game.wineprefix = text
+        }
+        toggle-gamescope() => {
+            game.use-gamescope = !game.use-gamescope
+        }
+        gamescope-width-edited(text) => {
+            game.gamescope-width = text.to-float()
+        }
+        gamescope-height-edited(text) => {
+            game.gamescope-height = text.to-float()
         }
     }
 }

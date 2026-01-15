@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use crate::models::{Game, Settings};
 
 pub fn launch_game(game: &Game, settings: &Settings) {
@@ -8,13 +6,23 @@ pub fn launch_game(game: &Game, settings: &Settings) {
     let wine_path = settings.proton_path.join("files").join("bin").join("wine");
     let umu_run_path = settings.umu_path.join("umu-run");
 
-    Command::new("gamescope")
-        .arg("-W").arg("1920")
-        .arg("-H").arg("1080")
-        .arg("-f")
-        .arg("--force-grab-cursor")
-        .arg("--")
-        .arg(umu_run_path)
+    let mut command = if game.use_gamescope {
+        std::process::Command::new("gamescope")
+    } else {
+        std::process::Command::new(&umu_run_path)
+    };
+
+    if game.use_gamescope {
+        command
+        .args([
+            "-W", &game.gamescope_width.to_string(),
+            "-H", &game.gamescope_height.to_string(),
+            "-f", "--force-grab-cursor",
+            "--", umu_run_path.to_str().unwrap_or_default(),
+        ]);
+    }
+
+    command
         .arg(exe_name)
         .current_dir(exe_dir)
         .env("WINEPREFIX", game.wineprefix.as_os_str())
@@ -48,6 +56,19 @@ pub fn launch_game(game: &Game, settings: &Settings) {
         .env("WINE_LARGE_ADDRESS_AWARE", "1")
         .env("STORE", "none")
         .env("GAMEID", "umu-default")
-        .env("PROTON_VERB", "run")
+        .env("PROTON_VERB", "run");
+
+    command.spawn().unwrap();
+}
+
+pub fn launch_winecfg(game: &Game, settings: &Settings) {
+    let umu_run_path = settings.umu_path.join("umu-run");
+
+    std::process::Command::new(&umu_run_path)
+        .arg("winecfg")
+        .env("WINEPREFIX", game.wineprefix.as_os_str())
+        .env("PROTONPATH", settings.proton_path.as_os_str())
+        .env("PROTON_LOG", "1")
+        .env("WINEARCH", "win64")
         .spawn().unwrap();
 }

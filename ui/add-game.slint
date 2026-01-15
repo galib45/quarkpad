@@ -1,24 +1,78 @@
-import { AppBar, FileInput } from "components.slint";
-import { ScrollView, Button, LineEdit } from "std-widgets.slint";
+import {
+    AppBar,
+    FileInput,
+    FileInputWithLabel,
+    LineEditWithLabel,
+} from "components.slint";
+import { ScrollView, Button, LineEdit, Switch } from "std-widgets.slint";
 
 export struct Game {
     name: string,
     cover-path: string,
     exe-path: string,
     wineprefix: string,
+    use-gamescope: bool,
+    gamescope-width: int,
+    gamescope-height: int,
+}
+
+component GameScopeConfig inherits Rectangle {
+    in-out property <bool> use-gamescope <=> use-gamescope-switch.checked;
+    in-out property <int> gamescope-width;
+    in-out property <int> gamescope-height;
+    callback toggled <=> use-gamescope-switch.toggled;
+    callback width-edited <=> width-input.edited;
+    callback height-edited <=> height-input.edited;
+    HorizontalLayout {
+        padding-top: 16px;
+        VerticalLayout {
+            spacing: 24px;
+            use-gamescope-switch := Switch {
+                text: "Use Gamescope";
+            }
+
+            VerticalLayout {
+                spacing: 12px;
+                Text {
+                    text: "Gamescope Configuration";
+                    font-size: 16px;
+                }
+
+                HorizontalLayout {
+                    spacing: 16px;
+                    width-input := LineEditWithLabel {
+                        label: "Width";
+                        enabled: use-gamescope;
+                        text: gamescope-width;
+                    }
+
+                    height-input := LineEditWithLabel {
+                        label: "Height";
+                        enabled: use-gamescope;
+                        text: gamescope-height;
+                    }
+                }
+            }
+        }
+    }
 }
 
 export component AddGamePage inherits Rectangle {
     in-out property <Game> game;
     callback back-clicked <=> app-bar.icon-clicked;
-    callback click-save();
-    callback choose-cover-path();
-    callback choose-exe-path();
-    callback choose-wineprefix();
+    callback click-save <=> save-button.clicked;
+    callback choose-cover-path <=> cover-path-input.choose-file;
+    callback choose-exe-path <=> exe-path-input.choose-file;
+    callback choose-wineprefix <=> wineprefix-input.choose-file;
+
+    callback toggle-gamescope <=> gamescope-config.toggled;
+    callback gamescope-width-edited <=> gamescope-config.width-edited;
+    callback gamescope-height-edited <=> gamescope-config.height-edited;
+
     callback name-edited <=> name-le.edited;
-    callback cover-path-edited <=> cover-path-le.edited;
-    callback exe-path-edited <=> exe-path-le.edited;
-    callback wineprefix-edited <=> wineprefix-le.edited;
+    callback cover-path-edited <=> cover-path-input.edited;
+    callback exe-path-edited <=> exe-path-input.edited;
+    callback wineprefix-edited <=> wineprefix-input.edited;
 
     VerticalLayout {
         app-bar := AppBar {
@@ -27,83 +81,45 @@ export component AddGamePage inherits Rectangle {
         }
 
         ScrollView {
-            HorizontalLayout {
+            VerticalLayout {
                 padding: 32px;
                 width: min(600px, max(300px, parent.width * 0.8));
-                VerticalLayout {
-                    padding: 16px;
-                    spacing: 16px;
-                    alignment: start;
+                spacing: 16px;
+                name-le := LineEditWithLabel {
+                    label: "Game Name";
+                    text: game.name;
+                }
 
-                    VerticalLayout {
-                        spacing: 6px;
-                        Text {
-                            text: "Game Name";
-                        }
+                cover-path-input := FileInputWithLabel {
+                    label: "Cover Path";
+                    text: game.cover-path;
+                }
 
-                        name-le := LineEdit {
-                            text: game.name;
-                        }
-                    }
+                exe-path-input := FileInputWithLabel {
+                    label: "Executable Path";
+                    text: game.exe-path;
+                }
 
-                    VerticalLayout {
-                        spacing: 6px;
-                        Text {
-                            text: "Cover Path";
-                        }
+                wineprefix-input := FileInputWithLabel {
+                    label: "Wineprefix";
+                    text: game.wineprefix;
+                    folder: true;
+                }
 
-                        cover-path-le := FileInput {
-                            path: game.cover-path;
-                            choose-file => {
-                                choose-cover-path()
-                            }
-                        }
-                    }
+                gamescope-config := GameScopeConfig {
+                    use-gamescope: game.use-gamescope;
+                    gamescope-width: game.gamescope-width <= 0 ? 1920 : game.gamescope-width;
+                    gamescope-height: game.gamescope-height <= 0 ? 1080 : game.gamescope-height;
+                }
 
-                    VerticalLayout {
-                        spacing: 6px;
-                        Text {
-                            text: "Executable Path";
-                        }
-
-                        exe-path-le := FileInput {
-                            path: game.exe-path;
-                            choose-file => {
-                                choose-exe-path()
-                            }
-                        }
-                    }
-
-                    VerticalLayout {
-                        spacing: 6px;
-                        Text {
-                            text: "Wineprefix";
-                        }
-
-                        wineprefix-le := FileInput {
-                            path: game.wineprefix;
-                            folder: true;
-                            choose-file => {
-                                choose-wineprefix()
-                            }
-                        }
-                    }
-
-                    VerticalLayout {
-                        padding-top: 64px;
-
-                        HorizontalLayout {
-                            alignment: center;
-
-                            Button {
-                                text: "Save";
-                                width: 128px;
-                                primary: true;
-                                clicked => {
-                                    click-save()
-                                }
-                            }
-                        }
+                HorizontalLayout {
+                    padding-top: 64px;
+                    alignment: center;
+                    save-button := Button {
+                        text: "Save";
+                        width: 128px;
+                        height: 32px;
+                        primary: true;
                     }
                 }
             }

@@ -32,7 +32,16 @@ pub struct Game {
     pub cover_path: PathBuf,
     pub exe_path: PathBuf,
     pub wineprefix: PathBuf,
+    #[serde(default)]
+    pub use_gamescope: bool,
+    #[serde(default = "default_gamescope_width")]
+    pub gamescope_width: i32,
+    #[serde(default = "default_gamescope_height")]
+    pub gamescope_height: i32,
 }
+
+fn default_gamescope_width() -> i32 { 1920 }
+fn default_gamescope_height() -> i32 { 1080 }
 
 impl From<crate::Game> for Game {
     fn from(game: crate::Game) -> Self {
@@ -40,7 +49,10 @@ impl From<crate::Game> for Game {
             name: game.name.to_string(),
             cover_path: PathBuf::from(game.cover_path.as_str()),
             exe_path: PathBuf::from(game.exe_path.as_str()),
-            wineprefix: PathBuf::from(game.wineprefix.as_str())
+            wineprefix: PathBuf::from(game.wineprefix.as_str()),
+            use_gamescope: game.use_gamescope,
+            gamescope_width: game.gamescope_width,
+            gamescope_height: game.gamescope_height,
         }
     }
 }
@@ -51,7 +63,10 @@ impl Into<crate::Game> for Game {
             name: SharedString::from(self.name.as_str()),
             cover_path: SharedString::from(self.cover_path.to_str().unwrap()),
             exe_path: SharedString::from(self.exe_path.to_str().unwrap()),
-            wineprefix: SharedString::from(self.wineprefix.to_str().unwrap())
+            wineprefix: SharedString::from(self.wineprefix.to_str().unwrap()),
+            use_gamescope: self.use_gamescope,
+            gamescope_width: self.gamescope_width,
+            gamescope_height: self.gamescope_height,
         }
     }
 }
