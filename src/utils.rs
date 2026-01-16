@@ -1,15 +1,19 @@
-use crate::models::{Game, Settings};
+use std::sync::{Arc, Mutex};
 
-pub fn launch_game(game: &Game, settings: &Settings) {
+use smol::io::AsyncBufReadExt;
+
+use crate::{models::{Game, Settings}};
+
+pub async fn launch_game(game: &Game, settings: &Settings, callback: impl FnMut(String) + Send + Sync + 'static) {
     let exe_dir = game.exe_path.parent().unwrap();
     let exe_name = game.exe_path.file_name().unwrap();
     let wine_path = settings.proton_path.join("files").join("bin").join("wine");
     let umu_run_path = settings.umu_path.join("umu-run");
 
     let mut command = if game.use_gamescope {
-        std::process::Command::new("gamescope")
+        smol::process::Command::new("gamescope")
     } else {
-        std::process::Command::new(&umu_run_path)
+        smol::process::Command::new(&umu_run_path)
     };
 
     if game.use_gamescope {
@@ -58,17 +62,80 @@ pub fn launch_game(game: &Game, settings: &Settings) {
         .env("GAMEID", "umu-default")
         .env("PROTON_VERB", "run");
 
-    command.spawn().unwrap();
+    spawn_with_streaming_capture(command, callback).await;
 }
 
-pub fn launch_winecfg(game: &Game, settings: &Settings) {
+pub async fn launch_winecfg(game: &Game, settings: &Settings, callback: impl FnMut(String) + Send + Sync + 'static) {
     let umu_run_path = settings.umu_path.join("umu-run");
 
-    std::process::Command::new(&umu_run_path)
+    let mut command = smol::process::Command::new(&umu_run_path);
+    command
         .arg("winecfg")
         .env("WINEPREFIX", game.wineprefix.as_os_str())
         .env("PROTONPATH", settings.proton_path.as_os_str())
         .env("PROTON_LOG", "1")
-        .env("WINEARCH", "win64")
-        .spawn().unwrap();
+        .env("WINEARCH", "win64");
+    spawn_with_streaming_capture(command, callback).await;
+}
+
+async fn spawn_with_streaming_capture(
+    mut command: smol::process::Command,
+    on_line_callback: impl FnMut(String) + Send + Sync + 'static
+) {
+    command
+        .stdout(smol::process::Stdio::piped())
+        .stderr(smol::process::Stdio::piped());
+
+    let mut child = command.spawn().unwrap();
+    let on_line_cb_arc_mutex = Arc::new(Mutex::new(on_line_callback));
+
+    let callback = on_line_cb_arc_mutex.clone();
+    callback.lock().unwrap()(format!("[{}]", chrono::Local::now().format("%Y-%m-%d %I:%M:%S %p")));
+    callback.lock().unwrap()("  RUNNING\n".into());
+    callback.lock().unwrap()(format!("{:?}\n\n", command));
+
+    let stdout = child.stdout.take().unwrap();
+    let stderr = child.stderr.take().unwrap();
+
+    let callback = on_line_cb_arc_mutex.clone();
+    let stdout_task = smol::spawn(async move {
+        let mut reader = smol::io::BufReader::new(stdout);
+        let mut line = String::new();
+        while reader.read_line(&mut line).await.unwrap() > 0 {
+            callback.lock().unwrap()(
+                format!(
+                    "[STDOUT] {}",
+                    String::from_utf8(strip_ansi_escapes::strip(&line)).unwrap()
+                )
+            );
+            line.clear();
+        }
+    });
+
+    let callback = on_line_cb_arc_mutex.clone();
+    let stderr_task = smol::spawn(async move {
+        let mut reader = smol::io::BufReader::new(stderr);
+        let mut line = String::new();
+        while reader.read_line(&mut line).await.unwrap() > 0 {
+            callback.lock().unwrap()(
+                format!(
+                    "[STDERR] {}",
+                    String::from_utf8(strip_ansi_escapes::strip(&line)).unwrap()
+                )
+            );
+            line.clear();
+        }
+    });
+
+    let status = child.status().await.unwrap();
+
+    stdout_task.await;
+    stderr_task.await;
+
+    let callback = on_line_cb_arc_mutex.clone();
+    if let Some(code) = status.code() {
+        callback.lock().unwrap()("-------------------\n".into());
+        callback.lock().unwrap()(format!("PROCESS EXITED WITH STATUS CODE {}\n", code));
+        callback.lock().unwrap()("-------------------\n\n\n".into());
+    }
 }

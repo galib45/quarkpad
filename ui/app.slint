@@ -1,9 +1,52 @@
-import { Button, ScrollView } from "std-widgets.slint";
+import { Button, ScrollView, TextEdit, Palette } from "std-widgets.slint";
 import { Settings, SettingsPage } from "settings.slint";
 import { HomePage } from "home.slint";
 import { AddGamePage, Game } from "add-game.slint";
+import { ThemeAgnosticColors } from "colors.slint";
 
-export component App inherits Window {
+component LogsDialog inherits Dialog {
+    in-out property <string> content <=> text-edit.text;
+    callback close-clicked <=> close-button.clicked;
+    width: 600px;
+    height: 400px;
+    Rectangle {
+        background: Palette.alternate-background;
+        VerticalLayout {
+            width: parent.width - 16px;
+            padding: 8px;
+            spacing: 16px;
+            Text {
+                text: "Logs";
+                font-size: 16px;
+            }
+
+            text-edit := TextEdit {
+                read-only: true;
+            }
+
+            HorizontalLayout {
+                padding-top: 8px;
+                spacing: 16px;
+                alignment: end;
+                scroll-button := Button {
+                    text: "Scroll";
+                    width: 128px;
+                    clicked => {
+                        text-edit.viewport-y = min(0px, - text-edit.viewport-height + text-edit.visible-height);
+                    }
+                }
+
+                close-button := Button {
+                    text: "Close";
+                    primary: true;
+                    width: 128px;
+                }
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
     in-out property <int> current_page: 0;
     in-out property <Settings> settings;
     in-out property <Game> game;
@@ -34,6 +77,8 @@ export component App inherits Window {
         }
     ];
     in property <int> editing: -1;
+    in property <bool> show-logs-dialog: false;
+    in property <string> logs-content;
 
     // home callbacks
     callback settings-clicked();
@@ -61,6 +106,8 @@ export component App inherits Window {
     callback toggle-gamescope();
     callback gamescope-width-edited();
     callback gamescope-height-edited();
+
+    callback logs-dialog-close-clicked();
 
     // preferred-width: 800px;
     // preferred-height: 600px;
@@ -144,6 +191,13 @@ export component App inherits Window {
         }
         gamescope-height-edited(text) => {
             game.gamescope-height = text.to-float()
+        }
+    }
+
+    if show-logs-dialog: LogsDialog {
+        content: logs-content;
+        close-clicked => {
+            logs-dialog-close-clicked()
         }
     }
 }
