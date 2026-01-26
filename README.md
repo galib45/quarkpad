@@ -4,14 +4,14 @@
 
 Quarkpad is a simple, open-source game launcher for Linux, designed to manage and launch games using [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom). It uses [Umu](https://github.com/Open-Wine-Components/umu-launcher) to run proton without steam and [Gamescope](https://github.com/ValveSoftware/gamescope) for scaling and going fullscreen. The UI is made with `gtk4` and `libadwaita`. You can organize the game library, add new games, configure basic settings, and launch them.
 
-## Screenshots
+<!--## Screenshots
 <div style="display: flex; flex-wrap: wrap; justify-content: center;">
   <img src="./screenshots/1.png" width="45%">
   <img src="./screenshots/4.png" width="45%">
   <img src="./screenshots/5.png" width="45%">
   <img src="./screenshots/2.png" width="45%">
   <img src="./screenshots/3.png" width="45%">
-</div>
+</div>-->
 
 ## Features
 
