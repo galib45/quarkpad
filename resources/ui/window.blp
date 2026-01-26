@@ -1,0 +1,55 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $QPWindow: Adw.ApplicationWindow {
+  title: _("Quarkpad");
+
+  Adw.ToastOverlay toasts {
+    Adw.NavigationView nav_view {
+      Adw.NavigationPage {
+        title: _("Games");
+
+        Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar header_bar {
+            [end]
+            Gtk.Button btn_goto_settings {
+              tooltip-text: _("Settings");
+              icon-name: "settings-symbolic";
+              action-name: "navigation.push";
+              action-target: "'settings-page'";
+            }
+
+            [end]
+            Gtk.Button btn_goto_add_edit_page {
+              tooltip-text: _("Add New Game");
+              icon-name: "list-add-symbolic";
+            }
+          }
+
+          content: Gtk.ScrolledWindow {
+            hexpand: true;
+            vexpand: true;
+
+            Gtk.GridView games_grid {
+              margin-start: 16;
+              margin-end: 16;
+              margin-top: 16;
+              margin-bottom: 16;
+            }
+          };
+        }
+      }
+
+      Adw.NavigationPage {
+        title: _("Settings");
+        tag: "settings-page";
+
+        Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+using Gtk 4.0;
+
+menu context_menu {
+  item {
+    label: _("Launch");
+    action: "item.launch";
+  }
+
+  item {
+    label: _("Edit");
+    action: "item.edit";
+  }
+
+  item {
+    label: _("Run winecfg");
+    action: "item.winecfg";
+  }
+}
+
+template $QPGridItem: Gtk.Box {
+  margin-start: 12;
+  margin-end: 12;
+  margin-top: 12;
+  margin-bottom: 12;
+  orientation: vertical;
+  height-request: 240;
+  spacing: 4;
+
+  Gtk.PopoverMenu popover_menu {
+    menu-model: context_menu;
+    has-arrow: false;
+    halign: start;
+  }
+
+  Gtk.Picture cover_image {
+    width-request: 132;
+    height-request: 176;
+    content-fit: cover;
+    keep-aspect-ratio: true;
+  }
+
+  Gtk.Label label {
+    wrap: true;
+    lines: 3;
+    ellipsize: end;
+    height-request: 60;
+  }
+}

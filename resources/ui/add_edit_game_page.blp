@@ -1,0 +1,133 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $QPAddEditGamePage: Adw.NavigationPage {
+  title: _("Add/Edit Game");
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Gtk.ScrolledWindow {
+      hexpand: true;
+      vexpand: true;
+
+      Gtk.Box {
+        margin-start: 16;
+        margin-end: 16;
+        margin-top: 16;
+        margin-bottom: 16;
+        orientation: vertical;
+
+        Adw.Clamp {
+          maximum-size: 600;
+
+          Gtk.Box {
+            orientation: vertical;
+            spacing: 32;
+
+            Adw.PreferencesGroup {
+              title: _("Game Information");
+
+              Adw.EntryRow game_name {
+                title: _("Name");
+              }
+
+              Adw.EntryRow cover_path {
+                title: _("Cover Image Path");
+
+                Gtk.Button btn_cover_path {
+                  icon-name: "folder-documents-symbolic";
+                  valign: center;
+                  tooltip-text: _("Select Cover Image File");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+
+              Adw.EntryRow exe_path {
+                title: _("Executable Path");
+
+                Gtk.Button btn_exe_path {
+                  icon-name: "folder-documents-symbolic";
+                  valign: center;
+                  tooltip-text: _("Select Executable File");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+
+              Adw.EntryRow wineprefix_path {
+                title: _("Wineprefix Path");
+
+                Gtk.Button btn_wineprefix_path {
+                  icon-name: "folder-symbolic";
+                  valign: center;
+                  tooltip-text: _("Select Winprefix Folder");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+
+              Adw.EntryRow extra_args {
+                title: _("Extra Arguments");
+              }
+
+              Adw.SwitchRow use_gamescope {
+                title: _("Use Gamescope");
+              }
+            }
+
+            Adw.PreferencesGroup pref_grp_gamescope {
+              title: _("Gamescope Config");
+              visible: false;
+
+              Adw.ActionRow {
+                title: _("Output Resolution");
+                subtitle: _("Width x Height");
+
+                [suffix]
+                Gtk.Box {
+                  spacing: 6;
+                  valign: center;
+
+                  Gtk.Entry gamescope_width {
+                    placeholder-text: _("Width");
+                    input-purpose: number;
+                    xalign: 0.5;
+                  }
+
+                  Gtk.Label {
+                    label: _("x");
+                  }
+
+                  Gtk.Entry gamescope_height {
+                    placeholder-text: _("Height");
+                    input-purpose: number;
+                    xalign: 0.5;
+                  }
+                }
+              }
+            }
+
+            Adw.PreferencesGroup {
+              Adw.ButtonRow btn_save {
+                title: _("Save");
+
+                styles [
+                  "suggested-action",
+                ]
+              }
+            }
+          }
+        }
+      }
+    };
+  }
+}

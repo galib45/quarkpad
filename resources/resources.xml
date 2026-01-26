@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gresources>
+<gresource prefix="/org/galib/quarkpad">
+    <file preprocess="xml-stripblanks">icons/settings-symbolic.svg</file>
+    <file>ui/window.ui</file>
+    <file>ui/grid_item.ui</file>
+    <file>ui/add_edit_game_page.ui</file>
+</gresource>
+</gresources>

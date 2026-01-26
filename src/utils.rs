@@ -1,8 +1,19 @@
+#![allow(dead_code)]
+
 use std::sync::{Arc, Mutex};
 
 use smol::io::AsyncBufReadExt;
 
 use crate::{models::{Game, Settings}};
+
+pub fn command_exists(cmd: &str) -> bool {
+    let status = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(&format!("command -v {cmd} >/dev/null 2>&1"))
+        .status()
+        .unwrap();
+    status.code() == Some(0)
+}
 
 pub async fn launch_game(game: &Game, settings: &Settings, callback: impl FnMut(String) + Send + Sync + 'static) {
     let exe_dir = game.exe_path.parent().unwrap();
@@ -10,17 +21,17 @@ pub async fn launch_game(game: &Game, settings: &Settings, callback: impl FnMut(
     let wine_path = settings.proton_path.join("files").join("bin").join("wine");
     let umu_run_path = settings.umu_path.join("umu-run");
 
-    let mut command = if game.use_gamescope {
+    let mut command = if game.gamescope_config.is_some() {
         smol::process::Command::new("gamescope")
     } else {
         smol::process::Command::new(&umu_run_path)
     };
 
-    if game.use_gamescope {
+    if let Some(config) = &game.gamescope_config {
         command
         .args([
-            "-W", &game.gamescope_width.to_string(),
-            "-H", &game.gamescope_height.to_string(),
+            "-W", &config.output_width.to_string(),
+            "-H", &config.output_height.to_string(),
             "-f", "--force-grab-cursor",
             "--", umu_run_path.to_str().unwrap_or_default(),
         ]);
@@ -29,7 +40,7 @@ pub async fn launch_game(game: &Game, settings: &Settings, callback: impl FnMut(
     command
         .arg(exe_name)
         .current_dir(exe_dir)
-        .env("WINEPREFIX", game.wineprefix.as_os_str())
+        .env("WINEPREFIX", game.wineprefix_path.as_os_str())
         .env("PROTONPATH", settings.proton_path.as_os_str())
         .env("GAME_NAME", game.name.as_str())
         .env("WINEDEBUG", "-all")
@@ -71,7 +82,7 @@ pub async fn launch_winecfg(game: &Game, settings: &Settings, callback: impl FnM
     let mut command = smol::process::Command::new(&umu_run_path);
     command
         .arg("winecfg")
-        .env("WINEPREFIX", game.wineprefix.as_os_str())
+        .env("WINEPREFIX", game.wineprefix_path.as_os_str())
         .env("PROTONPATH", settings.proton_path.as_os_str())
         .env("PROTON_LOG", "1")
         .env("WINEARCH", "win64");

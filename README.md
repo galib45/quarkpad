@@ -2,7 +2,7 @@
 
 ## Overview
 
-Quarkpad is a simple, open-source game launcher for Linux, designed to manage and launch games using [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom). It uses [Umu](https://github.com/Open-Wine-Components/umu-launcher) to run proton without steam and [Gamescope](https://github.com/ValveSoftware/gamescope) for scaling and going fullscreen. The UI is made with the `slint` framework. You can organize the game library, add new games, configure basic settings, and launch them.
+Quarkpad is a simple, open-source game launcher for Linux, designed to manage and launch games using [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom). It uses [Umu](https://github.com/Open-Wine-Components/umu-launcher) to run proton without steam and [Gamescope](https://github.com/ValveSoftware/gamescope) for scaling and going fullscreen. The UI is made with `gtk4` and `libadwaita`. You can organize the game library, add new games, configure basic settings, and launch them.
 
 ## Screenshots
 <div style="display: flex; flex-wrap: wrap; justify-content: center;">
@@ -21,19 +21,12 @@ Quarkpad is a simple, open-source game launcher for Linux, designed to manage an
 - **Settings**: Configure global application settings, including the path to your Proton installation.
 - **Persistent Data**: Game library and settings are automatically saved and loaded.
 
-## Technologies Used
-
--   **Rust**: The primary programming language.
--   **Slint**: A declarative UI toolkit for building native user interfaces.
--   **TOML**: Used for serializing and deserializing application data (game list and settings).
--   **`dirs` crate**: For cross-platform discovery of user-specific directories to store application data.
--   **`rfd` (Rust File Dialogs)**: For native file/folder selection dialogues.
-
 ## Getting Started
 
 ### Prerequisites
 
 - Rust and Cargo (latest stable version recommended)
+- gtk4 and libadwaita shared libraries installed in the system
 - [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom)
 - [Umu](https://github.com/Open-Wine-Components/umu-launcher)
 - [Gamescope](https://github.com/ValveSoftware/gamescope)
