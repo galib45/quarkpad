@@ -7,7 +7,6 @@ use gtk::glib;
 use gtk::gio;
 
 use crate::models::AppData;
-use crate::ui::add_edit_game_page::QPAddEditGamePage;
 use crate::ui::window::QPWindow;
 
 mod ui;
@@ -34,7 +33,6 @@ fn main() -> glib::ExitCode {
 
 fn app_main(app: &adw::Application) {
     load_custom_css();
-    let _ = QPAddEditGamePage::new();
     let window = QPWindow::new(app);
     window.present();
 }
@@ -44,6 +42,9 @@ fn load_custom_css() {
     css.load_from_string(r#"
         gridview {
             background-color: transparent;
+        }
+        textview {
+            font-family: monospace;
         }
     "#);
 

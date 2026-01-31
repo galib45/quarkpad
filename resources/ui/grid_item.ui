@@ -19,6 +19,10 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
       <attribute name="label" translatable="yes">Run winecfg</attribute>
       <attribute name="action">item.winecfg</attribute>
     </item>
+    <item>
+      <attribute name="label" translatable="yes">Remove</attribute>
+      <attribute name="action">item.remove</attribute>
+    </item>
   </menu>
   <template class="QPGridItem" parent="GtkBox">
     <property name="margin-start">12</property>

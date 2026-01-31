@@ -67,7 +67,17 @@ template $QPAddEditGamePage: Adw.NavigationPage {
                 Gtk.Button btn_wineprefix_path {
                   icon-name: "folder-symbolic";
                   valign: center;
-                  tooltip-text: _("Select Winprefix Folder");
+                  tooltip-text: _("Select Wineprefix Folder");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                Gtk.Button btn_create_wineprefix {
+                  icon-name: "folder-new-symbolic";
+                  valign: center;
+                  tooltip-text: _("Create Wineprefix");
 
                   styles [
                     "flat",

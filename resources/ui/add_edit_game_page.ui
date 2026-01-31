@@ -76,7 +76,17 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                                   <object class="GtkButton" id="btn_wineprefix_path">
                                     <property name="icon-name">folder-symbolic</property>
                                     <property name="valign">3</property>
-                                    <property name="tooltip-text" translatable="yes">Select Winprefix Folder</property>
+                                    <property name="tooltip-text" translatable="yes">Select Wineprefix Folder</property>
+                                    <style>
+                                      <class name="flat"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="btn_create_wineprefix">
+                                    <property name="icon-name">folder-new-symbolic</property>
+                                    <property name="valign">3</property>
+                                    <property name="tooltip-text" translatable="yes">Create Wineprefix</property>
                                     <style>
                                       <class name="flat"/>
                                     </style>

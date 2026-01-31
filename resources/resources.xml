@@ -5,5 +5,7 @@
     <file>ui/window.ui</file>
     <file>ui/grid_item.ui</file>
     <file>ui/add_edit_game_page.ui</file>
+    <file>ui/settings_page.ui</file>
+    <file>ui/logs_dialog.ui</file>
 </gresource>
 </gresources>

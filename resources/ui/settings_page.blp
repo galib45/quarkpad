@@ -1,0 +1,75 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $QPSettingsPage: Adw.NavigationPage {
+  title: _("Settings");
+  tag: "settings-page";
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Gtk.ScrolledWindow {
+      hexpand: true;
+      vexpand: true;
+
+      Gtk.Box {
+        margin-start: 16;
+        margin-end: 16;
+        margin-top: 16;
+        margin-bottom: 16;
+        orientation: vertical;
+
+        Adw.Clamp {
+          maximum-size: 600;
+
+          Gtk.Box {
+            orientation: vertical;
+            spacing: 32;
+
+            Adw.PreferencesGroup {
+              // title: _("Game Information");
+              Adw.EntryRow proton_path {
+                title: _("Proton Path");
+
+                Gtk.Button btn_proton_path {
+                  icon-name: "folder-symbolic";
+                  valign: center;
+                  tooltip-text: _("Select Proton Path");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+
+              Adw.EntryRow umu_path {
+                title: _("UMU Path");
+
+                Gtk.Button btn_umu_path {
+                  icon-name: "folder-symbolic";
+                  valign: center;
+                  tooltip-text: _("Select UMU Path");
+
+                  styles [
+                    "flat",
+                  ]
+                }
+              }
+            }
+
+            Adw.PreferencesGroup {
+              Adw.ButtonRow btn_save {
+                title: _("Save");
+
+                styles [
+                  "suggested-action",
+                ]
+              }
+            }
+          }
+        }
+      }
+    };
+  }
+}

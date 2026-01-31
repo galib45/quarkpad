@@ -1,0 +1,28 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $LogsDialog: Adw.Dialog {
+  title: "Logs";
+  content-width: 600;
+  content-height: 450;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Gtk.ScrolledWindow {
+      vexpand: true;
+      hexpand: true;
+
+      Gtk.TextView logs_view {
+        cursor-visible: false;
+        editable: false;
+        monospace: true;
+        left-margin: 12;
+        right-margin: 12;
+        top-margin: 12;
+        bottom-margin: 12;
+      }
+    };
+  };
+}

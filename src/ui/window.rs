@@ -14,6 +14,7 @@ use crate::models::GameObject;
 use crate::state;
 use crate::ui::add_edit_game_page::QPAddEditGamePage;
 use crate::ui::grid_item::QPGridItem;
+use crate::ui::settings_page::QPSettingsPage;
 use crate::utils;
 
 mod imp {
@@ -28,6 +29,10 @@ mod imp {
         pub nav_view: TemplateChild<adw::NavigationView>,
         #[template_child]
         pub btn_goto_add_edit_page: TemplateChild<gtk::Button>,
+        #[template_child]
+        pub btn_goto_settings_page: TemplateChild<gtk::Button>,
+        #[template_child]
+        pub banner: TemplateChild<adw::Banner>,
         #[template_child]
         pub games_grid: TemplateChild<gtk::GridView>,
     }
@@ -76,6 +81,15 @@ impl QPWindow {
 
     fn setup(&self) {
         let imp = self.imp();
+        self.refresh();
+        imp.banner.connect_button_clicked(glib::clone!(
+            #[weak(rename_to = nav_view)] imp.nav_view,
+            move |_| {
+                let add_page = QPSettingsPage::new();
+                nav_view.push(&add_page);
+            }
+        ));
+
         imp.btn_goto_add_edit_page.connect_clicked(glib::clone!(
             #[weak(rename_to = nav_view)] imp.nav_view,
             move |_| {
@@ -83,18 +97,52 @@ impl QPWindow {
                 nav_view.push(&add_page);
             }
         ));
+        imp.btn_goto_settings_page.connect_clicked(glib::clone!(
+            #[weak(rename_to = nav_view)] imp.nav_view,
+            move |_| {
+                let add_page = QPSettingsPage::new();
+                nav_view.push(&add_page);
+            }
+        ));
         self.setup_games_grid();
         imp.nav_view.connect_popped(glib::clone!(
             #[weak(rename_to = _self)] self,
             move |_nav_view, _nav_page| {
-                _self.refresh_games_grid();
+                _self.refresh();
             }
         ));
     }
 
-    pub fn refresh_games_grid(&self) {
+    pub fn refresh(&self) {
         let imp = self.imp();
 
+        // refresh the banner
+        let settings = {
+            let reader = state().read().unwrap();
+            reader.settings.clone()
+        };
+        let mut messages = Vec::new();
+        // Check Proton path
+        if settings.proton_path.as_os_str().is_empty() {
+            messages.push("Proton Path is not set");
+        } else if !settings.proton_path.exists() {
+            messages.push("Proton Path does not exist");
+        }
+        // Check UMU path
+        if settings.umu_path.as_os_str().is_empty() {
+            messages.push("UMU Path is not set");
+        } else if !settings.umu_path.exists() {
+            messages.push("UMU Path does not exist");
+        }
+        // Combine messages and update banner
+        if messages.is_empty() {
+            imp.banner.set_revealed(false);
+        } else {
+            imp.banner.set_title(&messages.join("; "));
+            imp.banner.set_revealed(true);
+        }
+
+        // refresh games_grid
         let games = {
             let reader = state().read().unwrap();
             reader.games.clone()

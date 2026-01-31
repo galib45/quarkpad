@@ -1,0 +1,103 @@
+id: org.galib.quarkpad
+runtime: org.gnome.Platform
+runtime-version: &gnome-version "49"
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.llvm20
+command: quarkpad
+finish-args:
+  - --allow=multiarch
+  - --allow=per-app-dev-shm
+  - --device=all
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=x11
+  - --socket=pulseaudio
+  - --talk-name=org.freedesktop.Flatpak
+  - --env=PATH=/app/bin:/usr/bin
+  - --env=RUST_LOG=quarkpad=debug
+  - --env=G_MESSAGES_DEBUG=none
+  - --env=RUST_BACKTRACE=1
+  - --filesystem=home
+  - --filesystem=xdg-data
+  - --filesystem=/mnt
+  - --filesystem=/media
+
+x-freedesktop-version: &freedesktop-version "25.08"
+x-gl-version: &gl-version "1.4"
+x-gl-versions: &gl-versions 25.08;1.4
+x-gl-merge-dirs: &gl-merge-dirs vulkan/icd.d;glvnd/egl_vendor.d;egl/egl_external_platform.d;OpenCL/vendors;lib/dri;lib/d3d;lib/gbm;vulkan/explicit_layer.d;vulkan/implicit_layer.d
+
+add-extensions:
+  org.freedesktop.Platform.Compat.i386:
+    directory: lib/i386-linux-gnu
+    version: *freedesktop-version
+
+  org.freedesktop.Platform.GL32:
+    directory: lib/i386-linux-gnu/GL
+    version: *gl-version
+    versions: *gl-versions
+    subdirectories: true
+    no-autodownload: true
+    autodelete: false
+    add-ld-path: lib
+    merge-dirs: *gl-merge-dirs
+    download-if: active-gl-driver
+    enable-if: active-gl-driver
+    autoprune-unless: active-gl-driver
+
+  org.freedesktop.Platform.GL32.Debug:
+    directory: lib/debug/lib/i386-linux-gnu/GL
+    version: *gl-version
+    versions: *gl-versions
+    subdirectories: true
+    no-autodownload: true
+    merge-dirs: *gl-merge-dirs
+    enable-if: active-gl-driver
+    autoprune-unless: active-gl-driver
+
+  org.freedesktop.Platform.VAAPI.Intel.i386:
+    directory: lib/i386-linux-gnu/dri/intel-vaapi-driver
+    version: *freedesktop-version
+    versions: *freedesktop-version
+    autodelete: false
+    no-autodownload: true
+    add-ld-path: lib
+    download-if: have-intel-gpu
+    autoprune-unless: have-intel-gpu
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm20/bin
+  build-args:
+    - --share=network
+  env:
+    CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: clang
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS: -C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: clang
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS: -C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold
+modules:
+  - name: bundle-setup
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/i386-linux-gnu
+      - mkdir -p /app/lib/debug/lib/i386-linux-gnu
+      - mkdir -p /app/lib/i386-linux-gnu/GL
+      - mkdir -p /app/lib/i386-linux-gnu/dri/intel-vaapi-driver
+      - install -Dm644 ld.so.conf /app/etc/ld.so.conf
+    sources:
+      - type: inline
+        dest-filename: ld.so.conf
+        contents: |
+          /app/lib32
+          /app/lib/i386-linux-gnu
+  - name: quarkpad
+    buildsystem: simple
+    build-commands:
+      - cargo build --release
+      - install -Dm755 target/release/quarkpad /app/bin/quarkpad
+    sources:
+      - type: dir
+        path: ../

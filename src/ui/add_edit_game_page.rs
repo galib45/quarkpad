@@ -1,5 +1,7 @@
 use std::path::PathBuf;
+use std::cell::RefCell;
 
+use adw::subclass::prelude::NavigationPageImpl;
 use adw::prelude::PreferencesGroupExt;
 use gtk::gio::prelude::FileExt;
 use gtk::glib;
@@ -11,10 +13,6 @@ use crate::models::GamescopeConfig;
 use crate::{models, state, utils};
 
 mod imp {
-    use std::cell::RefCell;
-
-    use adw::subclass::prelude::NavigationPageImpl;
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]
@@ -98,6 +96,7 @@ impl QPAddEditGamePage {
         imp.cover_path.set_text(game.cover_path.to_str().unwrap());
         imp.exe_path.set_text(game.exe_path.to_str().unwrap());
         imp.wineprefix_path.set_text(game.wineprefix_path.to_str().unwrap());
+        imp.extra_args.set_text(&game.extra_args);
         if let Some(config) = &game.gamescope_config {
             imp.use_gamescope.set_active(true);
             imp.gamescope_width.set_text(&config.output_width.to_string());

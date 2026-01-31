@@ -13,11 +13,9 @@ template $QPWindow: Adw.ApplicationWindow {
           [top]
           Adw.HeaderBar header_bar {
             [end]
-            Gtk.Button btn_goto_settings {
+            Gtk.Button btn_goto_settings_page {
               tooltip-text: _("Settings");
               icon-name: "settings-symbolic";
-              action-name: "navigation.push";
-              action-target: "'settings-page'";
             }
 
             [end]
@@ -31,23 +29,24 @@ template $QPWindow: Adw.ApplicationWindow {
             hexpand: true;
             vexpand: true;
 
-            Gtk.GridView games_grid {
-              margin-start: 16;
-              margin-end: 16;
-              margin-top: 16;
-              margin-bottom: 16;
+            Gtk.Box {
+              orientation: vertical;
+
+              Adw.Banner banner {
+                // title: _("Settings not configured");
+                button-label: _("Configure");
+                button-style: suggested;
+                // revealed: true;
+              }
+
+              Gtk.GridView games_grid {
+                margin-start: 16;
+                margin-end: 16;
+                margin-top: 16;
+                margin-bottom: 16;
+              }
             }
           };
-        }
-      }
-
-      Adw.NavigationPage {
-        title: _("Settings");
-        tag: "settings-page";
-
-        Adw.ToolbarView {
-          [top]
-          Adw.HeaderBar {}
         }
       }
     }

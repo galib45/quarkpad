@@ -20,11 +20,9 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                     <child type="top">
                       <object class="AdwHeaderBar" id="header_bar">
                         <child type="end">
-                          <object class="GtkButton" id="btn_goto_settings">
+                          <object class="GtkButton" id="btn_goto_settings_page">
                             <property name="tooltip-text" translatable="yes">Settings</property>
                             <property name="icon-name">settings-symbolic</property>
-                            <property name="action-name">navigation.push</property>
-                            <property name="action-target">'settings-page'</property>
                           </object>
                         </child>
                         <child type="end">
@@ -40,28 +38,26 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                         <property name="hexpand">true</property>
                         <property name="vexpand">true</property>
                         <child>
-                          <object class="GtkGridView" id="games_grid">
-                            <property name="margin-start">16</property>
-                            <property name="margin-end">16</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
+                          <object class="GtkBox">
+                            <property name="orientation">1</property>
+                            <child>
+                              <object class="AdwBanner" id="banner">
+                                <property name="button-label" translatable="yes">Configure</property>
+                                <property name="button-style">1</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkGridView" id="games_grid">
+                                <property name="margin-start">16</property>
+                                <property name="margin-end">16</property>
+                                <property name="margin-top">16</property>
+                                <property name="margin-bottom">16</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
                     </property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="AdwNavigationPage">
-                <property name="title" translatable="yes">Settings</property>
-                <property name="tag">settings-page</property>
-                <child>
-                  <object class="AdwToolbarView">
-                    <child type="top">
-                      <object class="AdwHeaderBar"></object>
-                    </child>
                   </object>
                 </child>
               </object>

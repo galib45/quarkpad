@@ -1,10 +1,12 @@
 use gtk::gio::prelude::ActionMapExt;
 use gtk::glib;
+use gtk::glib::object::CastNone;
 use gtk::prelude::{GestureSingleExt, PopoverExt, WidgetExt};
 use gtk::subclass::prelude::*;
 
 use crate::models::Game;
 use crate::ui::add_edit_game_page::QPAddEditGamePage;
+use crate::ui::window::QPWindow;
 use crate::{state, utils};
 
 mod imp {
@@ -79,19 +81,18 @@ impl QPGridItem {
         let launch_action = gio::SimpleAction::new("launch", None);
         launch_action.connect_activate(glib::clone!(
             #[strong] game,
+            #[weak(rename_to = _self)] self,
             move |_, _| {
                 let reader = state().read().unwrap();
                 let game = game.clone();
                 let settings = reader.settings.clone();
-                smol::spawn(async move {
-                    utils::launch_game(
-                        &game,
-                        &settings,
-                        move |line| {
-                            eprint!("{line}");
-                        }
-                    ).await;
-                }).detach();
+                utils::run_with_logs(
+                    &_self.root().unwrap(),
+                    game, settings,
+                    |game, settings, callback| async move {
+                        utils::launch_game(&game, &settings, callback).await;
+                    }
+                );
             }
         ));
 
@@ -108,8 +109,46 @@ impl QPGridItem {
             }
         ));
 
+        let remove_action = gio::SimpleAction::new("remove", None);
+        remove_action.connect_activate(glib::clone!(
+            #[strong] game,
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                {
+                    let mut writer = state().write().unwrap();
+                    let game_index = writer.games.iter().position(|x| *x == game);
+                    if let Some(index) = game_index {
+                        writer.games.remove(index);
+                        writer.save();
+                    }
+                }
+                let qp_window = _self.root().and_downcast::<QPWindow>().unwrap();
+                qp_window.refresh();
+            }
+        ));
+
+        let winecfg_action = gio::SimpleAction::new("winecfg", None);
+        winecfg_action.connect_activate(glib::clone!(
+            #[strong] game,
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                let reader = state().read().unwrap();
+                let game = game.clone();
+                let settings = reader.settings.clone();
+                utils::run_with_logs(
+                    &_self.root().unwrap(),
+                    game, settings,
+                    |game, settings, callback| async move {
+                        utils::launch_winecfg(&game, &settings, callback).await;
+                    }
+                );
+            }
+        ));
+
         action_group.add_action(&launch_action);
         action_group.add_action(&edit_action);
+        action_group.add_action(&remove_action);
+        action_group.add_action(&winecfg_action);
         self.insert_action_group("item", Some(&action_group));
     }
 }
