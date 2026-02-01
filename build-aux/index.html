@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Galib Flatpak Repository</title>
+
+        <style>
+            :root {
+                --bg: #0f1115;
+                --surface: #151821;
+                --text: #e6e6eb;
+                --muted: #a1a1aa;
+                --accent: #4f8cff;
+                --border: #262a36;
+                --code-bg: #0b0d12;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Roboto,
+                    Ubuntu,
+                    Cantarell,
+                    "Noto Sans",
+                    Helvetica,
+                    Arial,
+                    sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                line-height: 1.6;
+            }
+
+            .container {
+                max-width: 860px;
+                padding: 2.5rem 1.25rem 4rem;
+                margin: 0 auto;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+
+            p.lead {
+                color: var(--muted);
+                font-size: 1.05rem;
+                margin-bottom: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+                margin-top: 2.5rem;
+                margin-bottom: 0.75rem;
+                font-weight: 600;
+            }
+
+            .card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 1.25rem;
+                margin-top: 1rem;
+            }
+
+            /* ---- Code blocks ---- */
+            .code-block {
+                position: relative;
+            }
+
+            pre {
+                background: var(--code-bg);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 0.9rem 1rem;
+                overflow-x: auto;
+                font-size: 0.95rem;
+                margin: 0;
+            }
+
+            code {
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas,
+                    "Liberation Mono", monospace;
+                color: #d1d5ff;
+            }
+
+            .copy-btn {
+                position: absolute;
+                top: 0.6rem;
+                right: 0.6rem;
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--muted);
+                font-size: 0.8rem;
+                padding: 0.25rem 0.55rem;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+
+            .copy-btn:hover {
+                color: var(--text);
+                border-color: var(--accent);
+            }
+
+            .copy-btn.copied {
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+
+            .note {
+                margin-top: 0.75rem;
+                font-size: 0.95rem;
+                color: var(--muted);
+            }
+
+            footer {
+                margin-top: 4rem;
+                padding-top: 1.25rem;
+                border-top: 1px solid var(--border);
+                font-size: 0.9rem;
+                color: var(--muted);
+            }
+
+            a {
+                color: var(--accent);
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="container">
+            <h1>Galib’s Flatpak Repository</h1>
+            <p class="lead">
+                A third-party Flatpak repository providing custom Linux desktop
+                applications. Currently hosts <strong>Quarkpad</strong>.
+            </p>
+
+            <h2>1. Add the repository</h2>
+            <div class="card">
+                <div class="code-block">
+                    <button class="copy-btn" aria-label="Copy command">
+                        Copy
+                    </button>
+                    <pre><code>flatpak remote-add --if-not-exists galib-flatpaks \
+https://galib-flatpaks.netlify.app/repo/galib-flatpaks.flatpakrepo</code></pre>
+                </div>
+            </div>
+
+            <h2>2. Install required runtimes (i386 / graphics)</h2>
+            <div class="card">
+                <div class="code-block">
+                    <button class="copy-btn" aria-label="Copy commands">
+                        Copy
+                    </button>
+                    <pre><code>flatpak install org.freedesktop.Platform.Compat.i386//25.08
+flatpak install org.freedesktop.Platform.GL32.default//25.08
+flatpak install org.freedesktop.Platform.VAAPI.Intel.i386//25.08</code></pre>
+                </div>
+                <p class="note">
+                    These are required for 32-bit compatibility and GPU
+                    acceleration in 32-bit applications.
+                </p>
+            </div>
+
+            <h2>3. Install Quarkpad</h2>
+            <div class="card">
+                <div class="code-block">
+                    <button class="copy-btn" aria-label="Copy command">
+                        Copy
+                    </button>
+                    <pre><code>flatpak install org.galib.quarkpad</code></pre>
+                </div>
+            </div>
+
+            <footer>
+                <p>
+                    Maintained by Galib · Built with Flatpak · Hosted on Netlify
+                </p>
+            </footer>
+        </main>
+
+        <!-- Minimal copy-to-clipboard logic -->
+        <script>
+            document.querySelectorAll(".copy-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const code = btn.nextElementSibling.innerText.trim();
+                    navigator.clipboard.writeText(code);
+                    btn.textContent = "Copied";
+                    btn.classList.add("copied");
+                    setTimeout(() => {
+                        btn.textContent = "Copy";
+                        btn.classList.remove("copied");
+                    }, 1200);
+                });
+            });
+        </script>
+    </body>
+</html>

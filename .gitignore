@@ -1,6 +1,9 @@
-/target
 GEMINI.md
+.cargo
 .flatpak-builder
-/build
-/repo
 *.flatpak
+target
+build
+repo
+vendor
+*.zip

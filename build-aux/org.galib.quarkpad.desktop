@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Quarkpad
+Comment=Play windows games using Proton
+Exec=quarkpad
+Icon=org.galib.quarkpad
+Terminal=false
+Categories=Game;Utility;
+StartupNotify=true
