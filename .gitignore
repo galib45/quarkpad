@@ -1,5 +1,6 @@
 GEMINI.md
 .cargo
+.cargo.bak
 .flatpak-builder
 *.flatpak
 target
