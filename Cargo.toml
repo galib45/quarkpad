@@ -1,6 +1,6 @@
 [package]
 name = "quarkpad"
-version = "2.1.0"
+version = "2.1.1"
 edition = "2024"
 description = "A simple game launcher for Linux to manage and launch games using Proton."
 authors = ["Asadul Al Galib <asadulgalibvat69@gmail.com>"]
@@ -12,7 +12,6 @@ adw = { version = "0.8.1", package = "libadwaita", features = ["v1_8"] }
 chrono = "0.4.43"
 dirs = "6.0.0"
 gtk = { version = "0.10.3", package = "gtk4", features = ["blueprint", "v4_20"] }
-# rfd = "0.17.2"
 serde = { version = "1.0.228", features = ["derive"] }
 smol = "2.0.2"
 strip-ansi-escapes = "0.2.1"
