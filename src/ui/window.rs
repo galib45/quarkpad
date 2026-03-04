@@ -196,6 +196,7 @@ impl QPWindow {
         imp.games_grid.set_min_columns(2);
         imp.games_grid.set_max_columns(6);
         imp.games_grid.connect_activate(glib::clone!(
+            #[weak(rename_to = _self)] self,
             move |grid_view, index| {
                 let model = grid_view.model().unwrap();
                 let game_object = model.item(index).and_downcast::<models::GameObject>().unwrap();
@@ -204,15 +205,13 @@ impl QPWindow {
                         let reader = state().read().unwrap();
                         reader.settings.clone()
                     };
-                    smol::spawn(async move {
-                        utils::launch_game(
-                            &game,
-                            &settings,
-                            move |line| {
-                                eprint!("{line}");
-                            }
-                        ).await;
-                    }).detach();
+                    utils::run_with_logs(
+                        &_self.root().unwrap(),
+                        game, settings,
+                        |game, settings, callback| async move {
+                            utils::launch_game(&game, &settings, callback).await;
+                        }
+                    );
                 }
             }
         ));

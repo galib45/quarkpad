@@ -1,0 +1,5 @@
+flatpak-builder --force-clean --install-deps-from=flathub --gpg-sign="Asadul Al Galib" --repo=repo build build-aux/flatpak-manifest.yml
+flatpak build-bundle --gpg-sign="Asadul Al Galib" repo quarkpad.flatpak org.galib.quarkpad
+flatpak build-update-repo --gpg-sign="Asadul Al Galib" --generate-static-deltas --prune repo
+zip -r site.zip repo/
+zip -j site.zip build-aux/index.html
