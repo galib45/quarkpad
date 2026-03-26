@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<component type="desktop-application">
+  <id>org.galib.quarkpad</id>
+  <name>Quarkpad</name>
+  <summary>Play Windows games using Proton</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Unlicense</project_license>
+  <developer id="github.com/galib45">
+    <name>Asadul Al Galib</name>
+  </developer>
+  <description>
+    <p>
+        Quarkpad is a modern, lightweight game launcher for Linux designed to simplify managing and launching games using Proton and umu-launcher.
+        Built with Rust, GTK4, and Libadwaita, it provides a clean, native experience for Linux gamers who want a straightforward way to organize their library.
+    </p>
+  </description>
+  <launchable type="desktop-id">org.galib.quarkpad.desktop</launchable>
+  <url type="homepage">https://github.com/galib45/quarkpad</url>
+  <url type="bugtracker">https://github.com/galib45/quarkpad/issues</url>
+  <url type="vcs-browser">https://github.com/galib45/quarkpad</url>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="2.2.2" date="2026-03-26" />
+    <release version="2.2.1" date="2026-03-26" />
+    <release version="2.2.0" date="2026-03-26" />
+  </releases>
+</component>

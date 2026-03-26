@@ -100,6 +100,7 @@ modules:
       - install -Dm755 target/release/quarkpad /app/bin/quarkpad
       - install -Dm644 build-aux/org.galib.quarkpad.desktop /app/share/applications/org.galib.quarkpad.desktop
       - install -Dm644 build-aux/org.galib.quarkpad-128x128.png /app/share/icons/hicolor/128x128/apps/org.galib.quarkpad.png
+      - install -Dm644 build-aux/org.galib.quarkpad.metainfo.xml /app/share/metainfo/org.galib.quarkpad.metainfo.xml
     sources:
       - type: dir
         path: ../

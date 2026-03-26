@@ -2,8 +2,6 @@
 
 Quarkpad is a modern, lightweight game launcher for Linux designed to simplify managing and launching games using **Proton** and **umu-launcher**. Built with Rust, GTK4, and Libadwaita, it provides a clean, native experience for Linux gamers who want a straightforward way to organize their library.
 
-![Quarkpad Screenshot](screenshots/1.png)
-
 ## Features
 
 - **Proton Integration:** Easily launch Windows games using Proton and `umu-launcher`.

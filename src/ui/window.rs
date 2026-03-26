@@ -203,9 +203,11 @@ impl QPWindow {
                                     writer.save();
                                 }
                                 if line.starts_with("PROCESS EXITED") {
+                                    let now = chrono::Utc::now();
                                     let mut writer = state().write().unwrap();
                                     let matched = writer.games[index as usize].clone();
-                                    let duration = chrono::Utc::now() - matched.last_played.unwrap();
+                                    let duration = now - matched.last_played.unwrap();
+                                    writer.games[index as usize].last_played = Some(now);
                                     writer.games[index as usize].duration_played += duration.as_seconds_f64() as u64;
                                     writer.save();
                                 }

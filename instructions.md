@@ -10,6 +10,6 @@ flatpak build-update-repo --gpg-sign="Asadul Al Galib" --generate-static-deltas 
 rm -rf site
 mkdir site
 mv repo site/
-mv build-aux/index.html site/
+cp build-aux/index.html site/
 netlify deploy --prod --no-build -d site
 ```

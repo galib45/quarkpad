@@ -24,8 +24,9 @@ pub fn state() -> &'static Arc<RwLock<AppData>> {
 
 fn main() -> glib::ExitCode {
     gio::resources_register_include!("compiled.gresource").expect("Failed to register resource");
-    glib::setenv("GSK_RENDERER", "gl", true).unwrap();
-
+    unsafe {
+        glib::setenv("GSK_RENDERER", "gl", true).unwrap();
+    }
     let app = adw::Application::builder().application_id(APP_ID).build();
     app.connect_activate(app_main);
     app.run()
