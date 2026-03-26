@@ -129,9 +129,11 @@ impl QPAddEditGamePage {
                                 output_width: imp.gamescope_width.text().parse().unwrap_or(1920),
                                 output_height: imp.gamescope_height.text().parse().unwrap_or(1080)
                             })
-                            } else {
-                                None
-                            }
+                        } else {
+                            None
+                        },
+                        duration_played: 0,
+                        last_played: None,
                     };
                     if let Some(index) = *imp.game_index.borrow() {
                         writer.games[index] = game;

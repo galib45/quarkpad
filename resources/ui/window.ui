@@ -34,10 +34,86 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                       </object>
                     </child>
                     <property name="content">
-                      <object class="GtkScrolledWindow">
-                        <property name="hexpand">true</property>
-                        <property name="vexpand">true</property>
-                        <child>
+                      <object class="AdwOverlaySplitView" id="split_view">
+                        <property name="collapsed">true</property>
+                        <property name="sidebar-position">1</property>
+                        <property name="sidebar">
+                          <object class="GtkBox">
+                            <property name="orientation">1</property>
+                            <property name="spacing">16</property>
+                            <property name="margin-start">16</property>
+                            <property name="margin-end">16</property>
+                            <property name="margin-top">16</property>
+                            <property name="margin-bottom">16</property>
+                            <child>
+                              <object class="GtkLabel" id="sidebar_label_title">
+                                <property name="xalign">0</property>
+                                <property name="wrap">true</property>
+                                <style>
+                                  <class name="title-2"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="spacing">8</property>
+                                <child>
+                                  <object class="GtkButton" id="sidebar_btn_launch">
+                                    <property name="icon-name">media-playback-start-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Launch</property>
+                                    <property name="action-name">sidebar.launch</property>
+                                    <style>
+                                      <class name="circular"/>
+                                      <class name="suggested-action"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="sidebar_btn_edit">
+                                    <property name="icon-name">document-edit-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Edit</property>
+                                    <property name="action-name">sidebar.edit</property>
+                                    <style>
+                                      <class name="flat"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="sidebar_btn_run_winecfg">
+                                    <property name="icon-name">wine-glass-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Run winecfg</property>
+                                    <property name="action-name">sidebar.winecfg</property>
+                                    <style>
+                                      <class name="flat"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="sidebar_btn_remove">
+                                    <property name="icon-name">user-trash-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Remove</property>
+                                    <property name="action-name">sidebar.remove</property>
+                                    <style>
+                                      <class name="flat"/>
+                                      <class name="destructive-action"/>
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="sidebar_label_duration_played">
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="sidebar_label_last_played">
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                        <property name="content">
                           <object class="GtkBox">
                             <property name="orientation">1</property>
                             <child>
@@ -47,15 +123,21 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                               </object>
                             </child>
                             <child>
-                              <object class="GtkGridView" id="games_grid">
-                                <property name="margin-start">16</property>
-                                <property name="margin-end">16</property>
-                                <property name="margin-top">16</property>
-                                <property name="margin-bottom">16</property>
+                              <object class="GtkScrolledWindow">
+                                <property name="hexpand">true</property>
+                                <property name="vexpand">true</property>
+                                <child>
+                                  <object class="GtkGridView" id="games_grid">
+                                    <property name="margin-start">16</property>
+                                    <property name="margin-end">16</property>
+                                    <property name="margin-top">16</property>
+                                    <property name="margin-bottom">16</property>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
-                        </child>
+                        </property>
                       </object>
                     </property>
                   </object>

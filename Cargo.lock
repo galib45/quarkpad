@@ -225,6 +225,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -924,7 +925,7 @@ dependencies = [
 
 [[package]]
 name = "quarkpad"
-version = "2.1.1"
+version = "2.2.0"
 dependencies = [
  "chrono",
  "dirs",

@@ -2,6 +2,9 @@
 <gresources>
 <gresource prefix="/org/galib/quarkpad">
     <file preprocess="xml-stripblanks">icons/settings-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/user-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/play-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/wine-glass-symbolic.svg</file>
     <file>ui/window.ui</file>
     <file>ui/grid_item.ui</file>
     <file>ui/add_edit_game_page.ui</file>

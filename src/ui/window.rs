@@ -1,4 +1,4 @@
-use gtk::NoSelection;
+use gtk::SingleSelection;
 use gtk::SignalListItemFactory;
 use gtk::prelude::*;
 use gtk::glib;
@@ -32,9 +32,17 @@ mod imp {
         #[template_child]
         pub btn_goto_settings_page: TemplateChild<gtk::Button>,
         #[template_child]
+        pub split_view: TemplateChild<adw::OverlaySplitView>,
+        #[template_child]
         pub banner: TemplateChild<adw::Banner>,
         #[template_child]
         pub games_grid: TemplateChild<gtk::GridView>,
+        #[template_child]
+        pub sidebar_label_title: TemplateChild<gtk::Label>,
+        #[template_child]
+        pub sidebar_label_duration_played: TemplateChild<gtk::Label>,
+        #[template_child]
+        pub sidebar_label_last_played: TemplateChild<gtk::Label>,
     }
 
     #[glib::object_subclass]
@@ -105,6 +113,8 @@ impl QPWindow {
             }
         ));
         self.setup_games_grid();
+        self.setup_actions();
+
         imp.nav_view.connect_popped(glib::clone!(
             #[weak(rename_to = _self)] self,
             move |_nav_view, _nav_page| {
@@ -149,7 +159,7 @@ impl QPWindow {
         };
 
         if let Some(model) = imp.games_grid.model() {
-            if let Some(selection) = model.downcast_ref::<NoSelection>() {
+            if let Some(selection) = model.downcast_ref::<SingleSelection>() {
                 if let Some(list_store) = selection.model().and_downcast::<gio::ListStore>() {
                     list_store.remove_all();
                     for game in &games {
@@ -158,6 +168,156 @@ impl QPWindow {
                 }
             }
         }
+    }
+
+    fn setup_actions(&self) {
+        use gtk::gio;
+        let action_group = gio::SimpleActionGroup::new();
+
+        let launch_action = gio::SimpleAction::new("launch", None);
+        launch_action.connect_activate(glib::clone!(
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                let imp = _self.imp();
+                imp.split_view.set_show_sidebar(false);
+                let selection_model = imp.games_grid.model().and_downcast::<SingleSelection>().unwrap();
+                let index = selection_model.selected();
+                let game = {
+                    let reader = state().read().unwrap();
+                    reader.games[index as usize].clone()
+                };
+                let settings = {
+                    let reader = state().read().unwrap();
+                    reader.settings.clone()
+                };
+
+                utils::run_with_logs(
+                    &_self,
+                    game, settings,
+                    move |game, settings, mut callback| async move {
+                        utils::launch_game(&game, &settings, glib::clone!(
+                            move |line| {
+                                if line.starts_with("Proton: ") && line.ends_with("exe\n") {
+                                    let mut writer = state().write().unwrap();
+                                    writer.games[index as usize].last_played = Some(chrono::Utc::now());
+                                    writer.save();
+                                }
+                                if line.starts_with("PROCESS EXITED") {
+                                    let mut writer = state().write().unwrap();
+                                    let matched = writer.games[index as usize].clone();
+                                    let duration = chrono::Utc::now() - matched.last_played.unwrap();
+                                    writer.games[index as usize].duration_played += duration.as_seconds_f64() as u64;
+                                    writer.save();
+                                }
+
+                                callback(line);
+                            }
+                        )).await;
+                    }
+                );
+            }
+        ));
+
+        let edit_action = gio::SimpleAction::new("edit", None);
+        edit_action.connect_activate(glib::clone!(
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                let imp = _self.imp();
+                imp.split_view.set_show_sidebar(false);
+                let selection_model = imp.games_grid.model().and_downcast::<SingleSelection>().unwrap();
+                let index = selection_model.selected();
+                let game = {
+                    let reader = state().read().unwrap();
+                    reader.games[index as usize].clone()
+                };
+                let reader = state().read().unwrap();
+                if let Some(game_index) = reader.games.iter().position(|x| *x == game) {
+                    let edit_page = QPAddEditGamePage::with_game(game_index);
+                    imp.nav_view.push(&edit_page);
+                }
+            }
+        ));
+
+        let remove_action = gio::SimpleAction::new("remove", None);
+        remove_action.connect_activate(glib::clone!(
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                let imp = _self.imp();
+                imp.split_view.set_show_sidebar(false);
+                let selection_model = imp.games_grid.model().and_downcast::<SingleSelection>().unwrap();
+                let index = selection_model.selected();
+                let game = {
+                    let reader = state().read().unwrap();
+                    reader.games[index as usize].clone()
+                };
+                {
+                    let mut writer = state().write().unwrap();
+                    let game_index = writer.games.iter().position(|x| *x == game);
+                    if let Some(index) = game_index {
+                        writer.games.remove(index);
+                        writer.save();
+                    }
+                }
+                _self.refresh();
+            }
+        ));
+
+        let winecfg_action = gio::SimpleAction::new("winecfg", None);
+        winecfg_action.connect_activate(glib::clone!(
+            #[weak(rename_to = _self)] self,
+            move |_, _| {
+                let imp = _self.imp();
+                imp.split_view.set_show_sidebar(false);
+                let selection_model = imp.games_grid.model().and_downcast::<SingleSelection>().unwrap();
+                let index = selection_model.selected();
+                let game = {
+                    let reader = state().read().unwrap();
+                    reader.games[index as usize].clone()
+                };
+                let settings = {
+                    let reader = state().read().unwrap();
+                    reader.settings.clone()
+                };
+                utils::run_with_logs(
+                    &_self,
+                    game, settings,
+                    |game, settings, callback| async move {
+                        utils::launch_winecfg(&game, &settings, callback).await;
+                    }
+                );
+            }
+        ));
+
+        action_group.add_action(&launch_action);
+        action_group.add_action(&edit_action);
+        action_group.add_action(&remove_action);
+        action_group.add_action(&winecfg_action);
+        self.insert_action_group("sidebar", Some(&action_group));
+    }
+
+    fn show_sidebar(&self, index: usize) {
+        let game = {
+            let reader = state().read().unwrap();
+            reader.games[index as usize].clone()
+        };
+        let imp = self.imp();
+        imp.sidebar_label_title.set_text(&game.name);
+        let duration_played_text = if game.duration_played > 0 {
+            format!("Played for {}", utils::human_readable_duration(game.duration_played))
+        } else {
+            "Not played yet".into()
+        };
+        imp.sidebar_label_duration_played.set_text(
+            &duration_played_text
+        );
+
+        if let Some(last_played) = game.last_played {
+            let last_played_text = format!("Last played {}", utils::time_ago(last_played));
+            imp.sidebar_label_last_played.set_text(&last_played_text);
+        } else {
+            imp.sidebar_label_last_played.set_text("");
+        }
+        imp.split_view.set_show_sidebar(true);
     }
 
     fn setup_games_grid(&self) {
@@ -170,7 +330,9 @@ impl QPWindow {
                 model.append(&GameObject::new(game));
             }
         }
-        let selection_model = NoSelection::new(Some(model.clone()));
+        let selection_model = SingleSelection::new(None::<gio::ListModel>);
+        selection_model.set_autoselect(false);
+        selection_model.set_model(Some(&model));
         let factory = SignalListItemFactory::new();
 
         factory.connect_setup(glib::clone!(
@@ -195,24 +357,11 @@ impl QPWindow {
         imp.games_grid.set_factory(Some(&factory));
         imp.games_grid.set_min_columns(2);
         imp.games_grid.set_max_columns(6);
+        imp.games_grid.set_single_click_activate(true);
         imp.games_grid.connect_activate(glib::clone!(
             #[weak(rename_to = _self)] self,
-            move |grid_view, index| {
-                let model = grid_view.model().unwrap();
-                let game_object = model.item(index).and_downcast::<models::GameObject>().unwrap();
-                if let Some(game) = game_object.game() {
-                    let settings = {
-                        let reader = state().read().unwrap();
-                        reader.settings.clone()
-                    };
-                    utils::run_with_logs(
-                        &_self.root().unwrap(),
-                        game, settings,
-                        |game, settings, callback| async move {
-                            utils::launch_game(&game, &settings, callback).await;
-                        }
-                    );
-                }
+            move |_grid_view, index| {
+                _self.show_sidebar(index as usize);
             }
         ));
     }

@@ -1,3 +1,4 @@
+use chrono::Utc;
 use gtk::gio::prelude::ActionMapExt;
 use gtk::glib;
 use gtk::glib::object::CastNone;
@@ -83,14 +84,28 @@ impl QPGridItem {
             #[strong] game,
             #[weak(rename_to = _self)] self,
             move |_, _| {
-                let reader = state().read().unwrap();
                 let game = game.clone();
-                let settings = reader.settings.clone();
+                let settings = {
+                    let reader = state().read().unwrap();
+                    reader.settings.clone()
+                };
                 utils::run_with_logs(
                     &_self.root().unwrap(),
                     game, settings,
-                    |game, settings, callback| async move {
-                        utils::launch_game(&game, &settings, callback).await;
+                    |game, settings, mut callback| async move {
+                        utils::launch_game(&game, &settings, glib::clone!(
+                            #[strong] game,
+                            move |line| {
+                                if line.starts_with("Proton: ") && line.ends_with("exe\n") {
+                                    let mut writer = state().write().unwrap();
+                                    if let Some(matched) = writer.games.iter_mut().find(|g| **g == game) {
+                                        matched.last_played = Some(Utc::now());
+                                        writer.save();
+                                    }
+                                }
+                                callback(line);
+                            }
+                        )).await;
                     }
                 );
             }

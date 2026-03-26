@@ -25,27 +25,102 @@ template $QPWindow: Adw.ApplicationWindow {
             }
           }
 
-          content: Gtk.ScrolledWindow {
-            hexpand: true;
-            vexpand: true;
+          content: Adw.OverlaySplitView split_view {
+            collapsed: true;
+            sidebar-position: end;
 
-            Gtk.Box {
+            sidebar: Gtk.Box {
+              orientation: vertical;
+              spacing: 16;
+              margin-start: 16;
+              margin-end: 16;
+              margin-top: 16;
+              margin-bottom: 16;
+
+              Gtk.Label sidebar_label_title {
+                xalign: 0;
+                wrap: true;
+
+                styles [
+                  "title-2",
+                ]
+              }
+
+              Gtk.Box {
+                spacing: 8;
+
+                Gtk.Button sidebar_btn_launch {
+                  icon-name: "media-playback-start-symbolic";
+                  tooltip-text: _("Launch");
+                  action-name: "sidebar.launch";
+
+                  styles [
+                    "circular",
+                    "suggested-action",
+                  ]
+                }
+
+                Gtk.Button sidebar_btn_edit {
+                  icon-name: "document-edit-symbolic";
+                  tooltip-text: _("Edit");
+                  action-name: "sidebar.edit";
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                Gtk.Button sidebar_btn_run_winecfg {
+                  icon-name: "wine-glass-symbolic";
+                  tooltip-text: _("Run winecfg");
+                  action-name: "sidebar.winecfg";
+
+                  styles [
+                    "flat",
+                  ]
+                }
+
+                Gtk.Button sidebar_btn_remove {
+                  icon-name: "user-trash-symbolic";
+                  tooltip-text: _("Remove");
+                  action-name: "sidebar.remove";
+
+                  styles [
+                    "flat",
+                    "destructive-action",
+                  ]
+                }
+              }
+
+              Gtk.Label sidebar_label_duration_played {
+                xalign: 0;
+              }
+
+              Gtk.Label sidebar_label_last_played {
+                xalign: 0;
+              }
+            };
+
+            content: Gtk.Box {
               orientation: vertical;
 
               Adw.Banner banner {
-                // title: _("Settings not configured");
                 button-label: _("Configure");
                 button-style: suggested;
-                // revealed: true;
               }
 
-              Gtk.GridView games_grid {
-                margin-start: 16;
-                margin-end: 16;
-                margin-top: 16;
-                margin-bottom: 16;
+              Gtk.ScrolledWindow {
+                hexpand: true;
+                vexpand: true;
+
+                Gtk.GridView games_grid {
+                  margin-start: 16;
+                  margin-end: 16;
+                  margin-top: 16;
+                  margin-bottom: 16;
+                }
               }
-            }
+            };
           };
         }
       }

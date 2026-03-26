@@ -1,11 +1,79 @@
 #![allow(dead_code)]
 
+use core::convert::Into;
 use std::sync::{Arc, Mutex};
 use gtk::glib::{self, object::IsA};
 use adw::prelude::AdwDialogExt;
 use smol::io::AsyncBufReadExt;
+use chrono::{DateTime, Utc, Datelike};
 
 use crate::{models::{self, Game, Settings}, ui::logs_dialog::LogsDialog};
+
+pub fn human_readable_duration(mut seconds: u64) -> String {
+    let days = seconds / 86400;
+    seconds %= 86400;
+    let hours = seconds / 3600;
+    seconds %= 3600;
+    let minutes = seconds / 60;
+    let seconds = seconds % 60;
+
+    let mut parts = vec![];
+    if days > 0 { parts.push(format!("{} day{}", days, if days > 1 { "s" } else { "" })); }
+    if hours > 0 { parts.push(format!("{} hour{}", hours, if hours > 1 { "s" } else { "" })); }
+    if minutes > 0 { parts.push(format!("{} minute{}", minutes, if minutes > 1 { "s" } else { "" })); }
+    if seconds > 0 && parts.is_empty() { // only show seconds if everything else is zero
+        parts.push(format!("{} second{}", seconds, if seconds > 1 { "s" } else { "" }));
+    }
+
+    parts.join(" ")
+}
+
+pub fn time_ago(datetime: DateTime<Utc>) -> String {
+    let now = Utc::now();
+
+    if datetime > now {
+        return "just now".to_string(); // future time, treat as "now"
+    }
+
+    let delta = now - datetime;
+    let seconds = delta.num_seconds();
+
+    if seconds < 60 {
+        return format!("{} second{} ago", seconds, if seconds != 1 { "s" } else { "" });
+    }
+    if seconds < 3600 {
+        let minutes = delta.num_minutes();
+        return format!("{} minute{} ago", minutes, if minutes != 1 { "s" } else { "" });
+    }
+    if seconds < 86400 {
+        let hours = delta.num_hours();
+        return format!("{} hour{} ago", hours, if hours != 1 { "s" } else { "" });
+    }
+    if seconds < 30 * 86400 {
+        let days = delta.num_days();
+        return format!("{} day{} ago", days, if days != 1 { "s" } else { "" });
+    }
+
+    // Months and years calculation
+    let mut years = now.year() - datetime.year();
+    let mut months = now.month() as i32 - datetime.month() as i32;
+
+    if months < 0 {
+        years -= 1;
+        months += 12;
+    }
+
+    if years == 0 && months > 0 {
+        return format!("{} month{} ago", months, if months != 1 { "s" } else { "" });
+    }
+
+    if years > 0 {
+        return format!("{} year{} ago", years, if years != 1 { "s" } else { "" });
+    }
+
+    // fallback (should not happen)
+    "just now".to_string()
+}
 
 pub fn command_exists(cmd: &str) -> bool {
     let status = std::process::Command::new("sh")

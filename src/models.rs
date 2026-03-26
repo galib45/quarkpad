@@ -18,6 +18,10 @@ pub struct Game {
     pub extra_args: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gamescope_config: Option<GamescopeConfig>,
+    #[serde(default)]
+    pub duration_played: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_played: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
